@@ -400,7 +400,8 @@ FcCompareValueList (FcObject	     object,
 		    FcValueListPtr   v1orig,	/* pattern */
 		    FcValueListPtr   v2orig,	/* target */
 		    FcValue         *bestValue,
-		    double          *value,
+		    double          *value_strong,
+		    double          *value_weak,
 		    int             *n,
 		    FcResult        *result)
 {
@@ -461,18 +462,18 @@ FcCompareValueList (FcObject	     object,
 	FcValueListPrint (v2orig);
 	printf ("\n");
     }
-    if (value)
-    {
-	int weak    = match->weak;
-	int strong  = match->strong;
-	if (weak == strong)
-	    value[strong] += best;
+
+    if (value_strong) {
+	if (value_strong == value_weak)
+	    *value_strong += best;
 	else
-	{
-	    value[weak] += bestWeak;
-	    value[strong] += bestStrong;
-	}
+	    *value_strong += bestStrong;
     }
+    if (value_weak) {
+	if (value_strong != value_weak)
+	    *value_weak += bestWeak;
+    }
+
     if (n)
 	*n = pos;
 
@@ -510,10 +511,14 @@ FcCompare (FcPattern	*pat,
 	else
 	{
 	    const FcMatcher *match = FcObjectToMatcher (elt_i1->object, FcFalse);
+	    double *value_strong = (match ? &value[match->strong] : NULL);
+	    double *value_weak = (match ? &value[match->weak] : NULL);
+
 	    if (!FcCompareValueList (elt_i1->object, match,
 				     FcPatternEltValues(elt_i1),
 				     FcPatternEltValues(elt_i2),
-				     NULL, value, NULL, result))
+				     NULL, value_strong, value_weak,
+				     NULL, result))
 		return FcFalse;
 	    i1++;
 	    i2++;
@@ -582,7 +587,7 @@ FcFontRenderPrepare (FcConfig	    *config,
 
 		if (!FcCompareValueList (pel->object, match,
 					 FcPatternEltValues (pel),
-					 FcPatternEltValues (fel), NULL, NULL, &n, &result))
+					 FcPatternEltValues (fel), NULL, NULL, NULL, &n, &result))
 		{
 		    FcPatternDestroy (new);
 		    return NULL;
@@ -641,7 +646,7 @@ FcFontRenderPrepare (FcConfig	    *config,
 	    const FcMatcher *match = FcObjectToMatcher (pe->object, FcFalse);
 	    if (!FcCompareValueList (pe->object, match,
 				     FcPatternEltValues(pe),
-				     FcPatternEltValues(fe), &v, NULL, NULL, &result))
+				     FcPatternEltValues(fe), &v, NULL, NULL, NULL, &result))
 	    {
 		FcPatternDestroy (new);
 		return NULL;
