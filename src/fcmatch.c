@@ -88,6 +88,15 @@ FcCompareString (const FcValue *v1,
     return (double) FcStrCmpIgnoreCase (FcValueString(v1), FcValueString(v2)) != 0;
 }
 
+static FcPrepValue
+FcPreprocessFamily (FcValue *v)
+{
+    FcPrepValue prep;
+    prep.type = FcPrepStrHashIgnoreBlanksAndCase;
+    prep.str_hash = FcStrHashIgnoreBlanksAndCase(FcValueString(v));
+    return prep;
+}
+
 static double
 FcCompareFamily (const FcValue *v1,
 		    const FcPrepValue *p1,
@@ -95,6 +104,14 @@ FcCompareFamily (const FcValue *v1,
 			const FcPrepValue *p2,
 			FcValue *bestValue)
 {
+    if (p1->type == FcPrepStrHashIgnoreBlanksAndCase &&
+	p2->type == FcPrepStrHashIgnoreBlanksAndCase)
+    {
+	// If hashes are not matching, return fast
+	if (p1->str_hash != p2->str_hash)
+	    return 1.0;
+    }
+
     /* rely on the guarantee in FcPatternObjectAddWithBinding that
      * families are always FcTypeString. */
     const FcChar8* v1_string = FcValueString(v1);
