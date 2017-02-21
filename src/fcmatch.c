@@ -60,6 +60,15 @@ FcCompareNumber (const FcValue *value1,
     return v;
 }
 
+static FcPrepValue
+FcPreprocessString (FcValue *v)
+{
+    FcPrepValue prep;
+    prep.type = FcPrepStrHashIgnoreCase;
+    prep.str_hash = FcStrHashIgnoreCase(FcValueString(v));
+    return prep;
+}
+
 static double
 FcCompareString (const FcValue *v1,
 		    const FcPrepValue *p1,
@@ -68,6 +77,14 @@ FcCompareString (const FcValue *v1,
 			FcValue *bestValue)
 {
     *bestValue = FcValueCanonicalize (v2);
+    if (p1->type == FcPrepStrHashIgnoreCase &&
+	p2->type == FcPrepStrHashIgnoreCase)
+    {
+	// If hashes are not matching, return fast
+	if (p1->str_hash != p2->str_hash)
+	    return 1.0;
+    }
+
     return (double) FcStrCmpIgnoreCase (FcValueString(v1), FcValueString(v2)) != 0;
 }
 
