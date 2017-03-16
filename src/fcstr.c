@@ -164,7 +164,7 @@ FcStrCaseWalkerNext (FcCaseWalker *w)
 {
     FcChar8	r;
 
-    if (w->read)
+    if (unlikely(w->read))
     {
 	if ((r = *w->read++))
 	    return r;
@@ -172,7 +172,7 @@ FcStrCaseWalkerNext (FcCaseWalker *w)
     }
     r = *w->src++;
 
-    if ((r & 0xc0) == 0xc0)
+    if (unlikely((r & 0xc0) == 0xc0))
 	return FcStrCaseWalkerLong (w, r);
     if ('A' <= r && r <= 'Z')
         r = r - 'A' + 'a';
@@ -187,7 +187,7 @@ FcStrCaseWalkerNextSkipDelim (FcCaseWalker *w, char delim)
     do
     {
 	r = FcStrCaseWalkerNext(w);
-    } while (r == delim);
+    } while (unlikely(r == delim));
 
     return r;
 }
