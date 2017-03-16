@@ -106,11 +106,11 @@ FcCompareFamily (const FcValue *v1,
 {
     *bestValue = FcValueCanonicalize (v2);
 
-    if (p1->type == FcPrepStrHashIgnoreBlanksAndCase &&
-	p2->type == FcPrepStrHashIgnoreBlanksAndCase)
+    if (likely(p1->type == FcPrepStrHashIgnoreBlanksAndCase &&
+	       p2->type == FcPrepStrHashIgnoreBlanksAndCase))
     {
 	// If hashes are not matching, return fast
-	if (p1->str_hash != p2->str_hash)
+	if (likely(p1->str_hash != p2->str_hash))
 	    return 1.0;
     }
 
@@ -528,20 +528,20 @@ FcCompareValueList (FcObject	     object,
 	{
 	    FcValue matchValue;
 	    v = (match->compare) (&v1->value, &v1->prep_value, &v2->value, &v2->prep_value, &matchValue);
-	    if (v < 0)
+	    if (unlikely(v < 0))
 	    {
 		*result = FcResultTypeMismatch;
 		return FcFalse;
 	    }
 	    v = v * 1000 + j;
-	    if (v < best)
+	    if (unlikely(v < best))
 	    {
 		if (bestValue)
 		    *bestValue = matchValue;
 		best = v;
 		pos = k;
 	    }
-	    if (v1->binding == FcValueBindingStrong)
+	    if (unlikely(v1->binding == FcValueBindingStrong))
 	    {
 		if (v < bestStrong)
 		    bestStrong = v;
