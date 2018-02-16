@@ -626,7 +626,11 @@ struct _FcValuePromotionBuffer {
 
 /* fcbitset.c */
 
-typedef struct _FcBitset FcBitset;
+typedef struct _FcBitset {
+    size_t size;
+    size_t ones;
+    FcChar8 data[];
+} FcBitset;
 
 FcPrivate FcBitset *
 FcBitsetCreate (size_t size);
@@ -929,6 +933,9 @@ FcCharSetPrint (const FcCharSet *c);
 
 FcPrivate void
 FcPatternPrint2 (FcPattern *p1, FcPattern *p2, const FcObjectSet *os);
+
+FcPrivate void
+FcBitsetPrint (const FcBitset *s);
 
 extern FcPrivate int FcDebugVal;
 
