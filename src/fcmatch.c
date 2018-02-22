@@ -544,12 +544,12 @@ FcCompareValueList (FcObject	     object,
 	    }
 	    if (unlikely(v1->binding == FcValueBindingStrong))
 	    {
-		if (v < bestStrong)
+		if (unlikely(v < bestStrong))
 		    bestStrong = v;
 	    }
 	    else
 	    {
-		if (v < bestWeak)
+		if (unlikely(v < bestWeak))
 		    bestWeak = v;
 	    }
 	}
@@ -563,14 +563,14 @@ FcCompareValueList (FcObject	     object,
 	printf ("\n");
     }
 
-    if (value_strong) {
-	if (value_strong == value_weak)
+    if (likely(value_strong)) {
+	if (likely(value_strong == value_weak))
 	    *value_strong += best;
 	else
 	    *value_strong += bestStrong;
     }
-    if (value_weak) {
-	if (value_strong != value_weak)
+    if (likely(value_weak)) {
+	if (unlikely(value_strong != value_weak))
 	    *value_weak += bestWeak;
     }
 
