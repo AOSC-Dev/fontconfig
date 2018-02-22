@@ -556,7 +556,7 @@ FcCompareValueList (FcObject	     object,
     }
     if (FcDebug () & FC_DBG_MATCHV)
     {
-	printf (" %s: %g ", FcObjectName (object), best);
+	printf (" %s: %g(s)/%g(w) ", FcObjectName (object), bestStrong, bestWeak);
 	FcValueListPrint (v1orig);
 	printf (", ");
 	FcValueListPrint (v2orig);
